@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuam · Mantenedor CORE de Calificaciones Tributarias</title>
+<link rel="stylesheet" href="/static/estilos.css">
+</head>
+<body>
+<div id="login" class="login">
+  <form id="form-login" class="tarjeta-login" autocomplete="on">
+    <div class="marca">nuam</div>
+    <h1>Mantenedor CORE de Calificaciones Tributarias</h1>
+    <label>Correo<input id="l-email" type="email" autocomplete="username" required></label>
+    <label>Contraseña<input id="l-pass" type="password" autocomplete="current-password" required></label>
+    <button class="primario" type="submit">Ingresar</button>
+    <p id="l-error" class="error" role="alert"></p>
+  </form>
+</div>
+
+<div id="app" class="oculto">
+  <header class="barra">
+    <div class="marca">nuam <span>Mantenedor CORE</span></div>
+    <nav id="menu"></nav>
+    <div class="usuario"><span id="u-nombre"></span> <span id="u-rol" class="etiqueta"></span> <button id="salir" class="enlace">Salir</button></div>
+  </header>
+  <div id="aviso" class="aviso oculto" role="status"></div>
+
+  <main>
+    <!-- Calificaciones -->
+    <section id="v-cal" class="vista">
+      <div class="titulo"><h2>Calificaciones tributarias</h2><button id="b-nueva" class="primario">+ Ingresar calificación</button></div>
+      <form id="filtros" class="filtros">
+        <label>Mercado<select id="f-mercado"><option value="">Todos</option></select></label>
+        <label>Origen<select id="f-origen"><option value="">Todos</option></select></label>
+        <label>Fuente<select id="f-fuente"><option value="">Todas</option><option>Corredor</option><option>Entidad prestadora</option></select></label>
+        <label>Ejercicio<input id="f-anio" type="number" min="2000" max="2100" placeholder="2025"></label>
+        <label>Instrumento<input id="f-instr" placeholder="Ej: COPEC"></label>
+        <button class="secundario" type="submit">Buscar</button>
+        <button class="enlace" type="reset" id="f-limpiar">Limpiar</button>
+      </form>
+      <div class="tabla-wrap"><table id="t-cal"></table></div>
+      <div class="paginacion"><button id="p-ant" class="secundario">‹</button><span id="p-info"></span><button id="p-sig" class="secundario">›</button></div>
+    </section>
+
+    <!-- Carga masiva -->
+    <section id="v-csv" class="vista oculto">
+      <div class="titulo"><h2>Carga masiva (CSV)</h2></div>
+      <div class="panel">
+        <div class="fila">
+          <label>Tipo de carga<select id="c-tipo"><option value="montos">Por montos</option><option value="factores">Por factores</option></select></label>
+          <label>Archivo CSV<input id="c-archivo" type="file" accept=".csv,text/csv"></label>
+          <button id="c-prev" class="primario">Previsualizar</button>
+          <button id="c-plantilla" class="secundario">Descargar plantilla</button>
+        </div>
+        <p class="nota">La carga crea la calificación si no existe y la actualiza si ya existe (llave: ejercicio, mercado, instrumento y secuencia). Nada se guarda hasta confirmar; si una fila tiene errores no se guarda ninguna.</p>
+      </div>
+      <div id="c-res" class="panel oculto"></div>
+    </section>
+
+    <!-- Certificados -->
+    <section id="v-cert" class="vista oculto">
+      <div class="titulo"><h2>Homologar certificado (Certificado 70 / 44, DJ 1948 / 1922)</h2></div>
+      <div class="panel">
+        <div class="fila">
+          <label>Certificado (PDF, texto o escaneado)<input id="k-archivo" type="file" accept="application/pdf,.pdf"></label>
+          <button id="k-subir" class="primario">Extraer datos</button>
+        </div>
+        <p class="nota">Se extrae el texto del PDF (con OCR si está escaneado), se homologan las columnas a los factores 8 al 37 y se precarga el formulario para que usted revise y grabe.</p>
+        <p id="k-estado" class="nota"></p>
+      </div>
+    </section>
+
+    <!-- Usuarios -->
+    <section id="v-usr" class="vista oculto">
+      <div class="titulo"><h2>Usuarios</h2><button id="u-nuevo" class="primario">+ Nuevo usuario</button></div>
+      <div class="tabla-wrap"><table id="t-usr"></table></div>
+    </section>
+
+    <!-- Log -->
+    <section id="v-log" class="vista oculto">
+      <div class="titulo"><h2>Registro de auditoría (inmutable)</h2></div>
+      <form id="l-filtro" class="filtros"><label>Acción<input id="l-accion" placeholder="Creación, Edición, Carga…"></label><button class="secundario" type="submit">Filtrar</button></form>
+      <div class="tabla-wrap"><table id="t-log"></table></div>
+    </section>
+  </main>
+</div>
+
+<!-- Formulario de calificación -->
+<dialog id="d-cal">
+  <form id="form-cal" method="dialog">
+    <h3 id="d-titulo">Ingresar calificación</h3>
+    <p id="d-bolsa" class="nota oculto">Esta calificación proviene de la Bolsa. Al grabar se creará una versión propia de su corredora; la de la Bolsa no se modifica.</p>
+    <div class="grid-base">
+      <label>Ejercicio<input id="k-ejercicio" type="number" min="2000" max="2100" required></label>
+      <label>Mercado<select id="k-mercado" required></select></label>
+      <label>Instrumento<select id="k-instr" required></select></label>
+      <label>Secuencia evento<input id="k-sec" type="number" min="0" required></label>
+      <label>N.º dividendo<input id="k-div" type="number" min="0" value="0"></label>
+      <label>Tipo sociedad<select id="k-tipo"><option value="">—</option><option value="A">A (abierta)</option><option value="C">C (cerrada)</option></select></label>
+      <label>Fecha de pago<input id="k-fecha" type="date"></label>
+      <label>Valor histórico<input id="k-valor" inputmode="decimal"></label>
+      <label class="ancho">Descripción<input id="k-desc" maxlength="200"></label>
+      <label>Factor actualización<input id="k-fact-act" inputmode="decimal"></label>
+      <label class="check"><input id="k-isfut" type="checkbox"> ISFUT</label>
+      <button type="button" id="k-nuevo-instr" class="enlace">¿Instrumento no inscrito? Crear</button>
+    </div>
+    <fieldset class="modo">
+      <legend>Forma de ingreso</legend>
+      <label><input type="radio" name="modo" value="montos" checked> Por montos (el sistema calcula los factores)</label>
+      <label><input type="radio" name="modo" value="factores"> Por factores (ingreso directo)</label>
+    </fieldset>
+    <div id="k-grilla" class="grilla-factores"></div>
+    <p id="k-suma" class="nota"></p>
+    <p id="k-error" class="error" role="alert"></p>
+    <div class="botones">
+      <button type="button" id="k-calcular" class="secundario">Calcular</button>
+      <button type="button" id="k-grabar" class="primario">Grabar</button>
+      <button type="button" id="k-cancelar" class="enlace">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="d-instr">
+  <form method="dialog">
+    <h3>Instrumento no inscrito</h3>
+    <label>Código<input id="i-codigo" required maxlength="30"></label>
+    <label>Emisor<input id="i-emisor" maxlength="100"></label>
+    <label>Mercado<select id="i-mercado"></select></label>
+    <p id="i-error" class="error"></p>
+    <div class="botones"><button type="button" id="i-grabar" class="primario">Crear</button><button type="button" id="i-cancelar" class="enlace">Cancelar</button></div>
+  </form>
+</dialog>
+
+<dialog id="d-usr">
+  <form method="dialog">
+    <h3 id="du-titulo">Nuevo usuario</h3>
+    <label>Nombre<input id="du-nombre"></label>
+    <label>Correo<input id="du-email" type="email"></label>
+    <label>Contraseña (mín. 8)<input id="du-pass" type="password" autocomplete="new-password"></label>
+    <label>Rol<select id="du-rol"><option>Corredor</option><option>Administrador</option><option>Auditor</option></select></label>
+    <label>Corredora<select id="du-corr"></select></label>
+    <p id="du-error" class="error"></p>
+    <div class="botones"><button type="button" id="du-grabar" class="primario">Grabar</button><button type="button" id="du-cancelar" class="enlace">Cancelar</button></div>
+  </form>
+</dialog>
+
+<dialog id="d-det"><div id="det-cuerpo"></div><div class="botones"><button id="det-cerrar" class="secundario">Cerrar</button></div></dialog>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

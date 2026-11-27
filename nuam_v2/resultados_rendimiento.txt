@@ -1,0 +1,10 @@
+== R1: carga de 500 filas (30 factores cada una) + 50 usuarios concurrentes ==
+Carga CSV 500 filas: HTTP 201 en 0.74 s | filas en BD: 500 | valores de factores: 15000
+50 usuarios x 4 búsquedas = 200 peticiones en 1.33 s | errores 0 | media 0.240 s | p95 0.619 s | máx 0.712 s
+RESULTADO R1: PASÓ
+
+== ESTRÉS: carga de 5000 filas adicionales + 200 usuarios concurrentes ==
+Carga CSV 5000 filas: HTTP 201 en 7.05 s | total en BD: 5500
+200 usuarios x 4 búsquedas = 800 peticiones en 8.35 s | errores 0 | media 1.628 s | p95 3.087 s | máx 3.227 s
+Registros de auditoría: 6
+RESULTADO ESTRÉS: PASÓ (sin caídas ni errores)

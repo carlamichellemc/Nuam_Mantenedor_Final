@@ -1,0 +1,16 @@
+# NOTA: no fue ejecutado en el entorno de desarrollo (sin daemon Docker); se valida en la máquina del equipo.
+services:
+  bd:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: nuam }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD", "pg_isready", "-U", "postgres"], interval: 5s, retries: 10 }
+  api:
+    build: .
+    depends_on: { bd: { condition: service_healthy } }
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      NUAM_DSN: host=bd port=5432 dbname=nuam user=postgres password=postgres
+    volumes: [certificados:/app/data/storage]
+    ports: ["8080:8080"]
+volumes: { pgdata: {}, certificados: {} }
