@@ -148,7 +148,7 @@ async function abrirCal(id, previa) {
     montos = previa.montos; S.idCert = previa.id_certificado;
     const b = previa.datos_base;
     $("k-ejercicio").value = b.ejercicio || ""; if (b.mercado) $("k-mercado").value = b.mercado; $("k-sec").value = b.secuencia ?? ""; $("k-div").value = b.numero_dividendo ?? 0;
-    $("k-tipo").value = b.tipo_sociedad || ""; $("k-valor").value = b.valor_historico ?? ""; if (b.fecha_pago) $("k-fecha").value = b.fecha_pago.length === 10 && b.fecha_pago[4] === "-" ? b.fecha_pago : "";
+    $("k-tipo").value = b.tipo_sociedad || ""; $("k-valor").value = b.valor_historico ?? ""; if (b.fecha_pago) { const m = String(b.fecha_pago).trim().match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/); $("k-fecha").value = m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : (/^\d{4}-\d{2}-\d{2}$/.test(b.fecha_pago) ? b.fecha_pago : ""); }
     if (previa.instrumento) $("k-instr").value = previa.instrumento.id_instrumento;
   }
   $("d-bolsa").classList.toggle("oculto", !S.desdeBolsa || S.rol !== "Corredor");

@@ -7,7 +7,7 @@
 | Integrante | Rol | Participación |
 |---|---|---|
 | Carla Caro | Líder técnica y desarrolladora principal | Mayor parte del proyecto: análisis, diseño, desarrollo, pruebas y documentación |
-| Manuel Montecinos | Apoyo en desarrollo y documentación | Colaboración en tareas puntuales de análisis, revisión y documentación (detalle en la sección 3) |
+| Manuel Montecinos | Apoyo en desarrollo y documentación | Colaboración en tareas puntuales de análisis, revisión y documentación |
 
 ## 2. Contribuciones de Carla Caro
 | Área | Aporte |
